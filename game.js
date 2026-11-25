@@ -73,8 +73,17 @@ let screen = "title";
 function hasSave() {
   try {
     const raw = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
-    return !!(raw && raw.hero);
-  } catch (e) { return false; }
+    if (!raw || !raw.hero) return false;
+    const probe = createGame();
+    if (!probe.restore(raw)) {
+      clearSave();
+      return false;
+    }
+    return true;
+  } catch (e) {
+    clearSave();
+    return false;
+  }
 }
 
 function persist() {
@@ -263,10 +272,15 @@ function renderSheet(view) {
   $("sheet-body").innerHTML = "<div class='sheet-grid'>" + mods + "</div>" + extra;
 }
 
+function openOverlay(id) {
+  closeOverlays();
+  $(id).hidden = false;
+}
+
 function openSheet() {
   if (!game) return;
   renderSheet(game.getView());
-  $("overlay-sheet").hidden = false;
+  openOverlay("overlay-sheet");
 }
 
 function closeOverlays() {
@@ -280,20 +294,20 @@ function presentSpecial(view) {
   if (view.levelUp) {
     $("lvl-title").textContent = "Nivo " + view.levelUp.level;
     $("lvl-body").innerHTML = view.levelUp.lines.map((l) => "<p class='inv'>" + l + "</p>").join("");
-    $("overlay-level").hidden = false;
+    openOverlay("overlay-level");
     beep("level");
     return true;
   }
   if (view.reaction) {
-    $("react-text").textContent = view.reaction.text;
-    $("overlay-react").hidden = false;
+    $("react-text").textContent = view.reaction.text || "Napad te pogađa. Hoćeš li da upotrebiš Štit?";
+    openOverlay("overlay-react");
     return true;
   }
   if (view.ending === "victory") {
     $("end-title").textContent = "Pobeda";
     $("end-text").textContent = view.text;
     $("btn-retry").hidden = true;
-    $("overlay-end").hidden = false;
+    openOverlay("overlay-end");
     clearSave();
     beep("win");
     return true;
@@ -301,11 +315,12 @@ function presentSpecial(view) {
   if (view.ending === "defeat") {
     $("end-title").textContent = "Pad";
     $("end-text").textContent = view.text;
-    $("btn-retry").hidden = false;
-    $("overlay-end").hidden = false;
+    $("btn-retry").hidden = !(game && typeof game.canRetryCombat === "function" && game.canRetryCombat());
+    openOverlay("overlay-end");
     beep("lose");
     return true;
   }
+  closeOverlays();
   return false;
 }
 
@@ -328,6 +343,10 @@ async function onAction(id, view) {
   ac();
   const hp = view.hero ? view.hero.hp : 0;
   try {
+    if (id === "new_game") {
+      newAdventure();
+      return;
+    }
     if (view.inCombat && view.playerTurn) game.combat(id);
     else game.choose(id);
     await afterAction(hp);
@@ -350,15 +369,27 @@ function startAdventure(classId) {
 function continueAdventure() {
   try {
     const raw = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
-    if (!raw || !raw.hero) return renderCreate();
+    if (!raw || !raw.hero) {
+      clearSave();
+      return renderCreate();
+    }
     game = createGame();
-    if (!game.restore(raw)) return renderCreate();
+    if (!game.restore(raw)) {
+      clearSave();
+      game = null;
+      closeOverlays();
+      return renderTitle();
+    }
     closeOverlays();
     const view = game.getView();
     renderPlay(view);
     presentSpecial(view);
+    persist();
   } catch (e) {
-    renderCreate();
+    clearSave();
+    game = null;
+    closeOverlays();
+    renderTitle();
   }
 }
 
@@ -401,8 +432,10 @@ $("btn-no-shield").addEventListener("click", async () => {
   try { await afterAction(hp); } finally { busy = false; }
 });
 $("btn-retry").addEventListener("click", () => {
-  if (!game) return;
-  game.retryCombat();
+  if (!game || !game.retryCombat()) {
+    closeOverlays();
+    return newAdventure();
+  }
   closeOverlays();
   renderPlay(game.getView());
   persist();

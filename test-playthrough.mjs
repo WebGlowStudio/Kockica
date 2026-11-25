@@ -189,3 +189,71 @@ if (ratnikRate < 0.5) {
   process.exit(1);
 }
 console.log("PLAYTHROUGH_OK");
+
+
+// --- save / restore sanitization ---
+function assert(cond, msg) {
+  if (!cond) {
+    console.error("ASSERT", msg);
+    process.exit(1);
+  }
+}
+
+{
+  const g = createGame({ rng: mulberry32(1) });
+  g.start({ name: "Mira", classId: "carobnjak" });
+  const good = g.serialize();
+  const g2 = createGame({ rng: mulberry32(2) });
+  assert(g2.restore(good), "valid save should restore");
+  assert(g2.getView().hero.classId === "carobnjak", "class kept");
+  assert(g2.getView().sceneId === "tavern", "scene kept");
+
+  const finished = JSON.parse(JSON.stringify(good));
+  finished.ending = "victory";
+  const g3 = createGame();
+  assert(!g3.restore(finished), "victory save should be discarded");
+
+  const badHero = { hero: { name: "x" }, scene: "tavern" };
+  assert(!createGame().restore(badHero), "invalid hero discarded");
+
+  const mid = JSON.parse(JSON.stringify(good));
+  mid.combat = { enemies: [{ id: "goblin-1", name: "Goblin", hp: 5, hpMax: 7, ac: 13, alive: true, kind: "goblin" }], order: [{ type: "player", id: "player" }, { type: "enemy", id: "goblin-1" }], index: 0, round: 1, hidden: false, sneakUsed: false, strongUsed: false, bonusUsed: false, dodging: false, onWinScene: "forest_after" };
+  mid.reaction = { type: "shield", text: "Štit?", damage: 6, wouldMiss: true, typ: "attack", source: "Goblin" };
+  mid.scene = "forest_edge";
+  const g4 = createGame();
+  assert(g4.restore(mid), "mid-combat shield save restores");
+  const v4 = g4.getView();
+  assert(v4.inCombat, "still in combat");
+  assert(v4.reaction && v4.reaction.type === "shield", "shield reaction kept");
+  g4.react("none");
+  const v4b = g4.getView();
+  assert(!v4b.reaction, "reaction resolved");
+  assert(v4b.hero.hp < v4.hero.hp || v4b.ending === "defeat" || v4b.inCombat, "hit applied or combat continues");
+
+  const corruptCombat = JSON.parse(JSON.stringify(good));
+  corruptCombat.combat = { enemies: "nope" };
+  corruptCombat.reaction = { type: "shield", damage: 4 };
+  const g5 = createGame();
+  assert(g5.restore(corruptCombat), "corrupt combat is sanitized, not a hard fail");
+  const v5 = g5.getView();
+  assert(!v5.inCombat, "bad combat dropped");
+  assert(!v5.reaction, "orphan reaction dropped");
+  assert((v5.choices || []).length > 0, "has a working choice");
+
+  const enemyTurnSave = JSON.parse(JSON.stringify(mid));
+  enemyTurnSave.reaction = null;
+  enemyTurnSave.combat.index = 1; // enemy unit, no reaction — would softlock
+  const g6 = createGame();
+  assert(g6.restore(enemyTurnSave), "enemy-turn save restores");
+  const v6 = g6.getView();
+  assert(v6.inCombat && v6.playerTurn, "snapped to player turn");
+  assert(v6.combatActions.length > 0, "has combat actions");
+
+  const dead = JSON.parse(JSON.stringify(good));
+  dead.hero.hp = 0;
+  const g7 = createGame();
+  assert(g7.restore(dead), "dead hero restores as defeat");
+  assert(g7.getView().ending === "defeat", "ending is defeat");
+
+  console.log("RESTORE_OK");
+}

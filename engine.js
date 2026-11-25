@@ -1705,7 +1705,7 @@ export function createGame(opts = {}) {
   function getView() {
     const sv = sceneView();
     const defeated = state.ending === "defeat";
-    return {
+    const view = {
       sceneId: state.scene,
       location: sv.location,
       title: defeated ? "Pad" : sv.title,
@@ -1737,6 +1737,11 @@ export function createGame(opts = {}) {
       ending: state.ending,
       hidden: !!(state.combat && state.combat.hidden),
     };
+    const hasAct = (view.combatActions && view.combatActions.length) || (view.choices && view.choices.length) || view.reaction || view.levelUp || view.ending;
+    if (!hasAct) {
+      view.choices = [{ id: "new_game", label: "Nova avantura", hint: "Počni ispočetka" }];
+    }
+    return view;
   }
 
   function serialize() {
@@ -1753,6 +1758,62 @@ export function createGame(opts = {}) {
     });
   }
 
+  function heroLooksValid(h) {
+    return !!(h && CLASSES[h.classId] && h.mods && typeof h.hp === "number" && typeof h.hpMax === "number" && h.hpMax > 0 && typeof h.gold === "number");
+  }
+
+  function combatLooksValid(c) {
+    return !!(c && Array.isArray(c.enemies) && c.enemies.length && Array.isArray(c.order) && c.order.length && typeof c.index === "number");
+  }
+
+  function sanitizeState() {
+    if (!heroLooksValid(state.hero)) return false;
+    if (state.hero.hp < 0) state.hero.hp = 0;
+    if (state.hero.hp > state.hero.hpMax) state.hero.hp = state.hero.hpMax;
+    if (!state.flags || typeof state.flags !== "object") state.flags = {};
+    if (!Array.isArray(state.log)) state.log = [];
+    if (!SCENE[state.scene]) state.scene = "tavern";
+    if (state.ending && state.ending !== "victory" && state.ending !== "defeat") state.ending = null;
+    if (state.ending === "victory") return "finished";
+    if (state.combat && !combatLooksValid(state.combat)) {
+      state.combat = null;
+      state.reaction = null;
+    }
+    if (state.combatSnapshot && !heroLooksValid(state.combatSnapshot.hero)) {
+      state.combatSnapshot = null;
+    }
+    if (state.reaction) {
+      const okReact = combatLooksValid(state.combat) && !state.ending &&
+        state.hero.classId === "carobnjak" &&
+        state.reaction.type === "shield" &&
+        typeof state.reaction.damage === "number";
+      if (!okReact) state.reaction = null;
+    }
+    if (state.hero.hp <= 0 && state.ending !== "victory") {
+      state.ending = "defeat";
+    }
+    if (state.combat && state.ending !== "defeat") {
+      const alive = state.combat.enemies.filter(function (en) { return en && en.alive && en.hp > 0; });
+      if (!alive.length) {
+        state.combat = null;
+        state.reaction = null;
+      } else {
+        if (state.combat.index < 0 || state.combat.index >= state.combat.order.length) {
+          const pi = state.combat.order.findIndex(function (u) { return u && u.type === "player"; });
+          state.combat.index = pi >= 0 ? pi : 0;
+        }
+        const unit = state.combat.order[state.combat.index];
+        if (unit && unit.type === "enemy" && !state.reaction) {
+          const pi = state.combat.order.findIndex(function (u) { return u && u.type === "player"; });
+          if (pi >= 0) state.combat.index = pi;
+        }
+      }
+    }
+    if (!state.hero.flags || typeof state.hero.flags !== "object") state.hero.flags = {};
+    computeAC(state.hero);
+    return true;
+  }
+
   function restore(data) {
     if (!data || !data.hero) return false;
     state.hero = data.hero;
@@ -1765,7 +1826,14 @@ export function createGame(opts = {}) {
     state.combatSnapshot = data.combatSnapshot || null;
     state.reaction = data.reaction || null;
     state.rolls = [];
-    if (state.hero) computeAC(state.hero);
+    const ok = sanitizeState();
+    if (!ok || ok === "finished") {
+      state.hero = null;
+      state.combat = null;
+      state.reaction = null;
+      state.ending = null;
+      return false;
+    }
     return true;
   }
 
@@ -1817,6 +1885,7 @@ export function createGame(opts = {}) {
     react: applyReaction,
     ackLevelUp: ackLevelUp,
     retryCombat: retryCombat,
+    canRetryCombat: function () { return !!(state.combatSnapshot && heroLooksValid(state.combatSnapshot.hero)); },
     getView: getView,
     serialize: serialize,
     restore: restore,
