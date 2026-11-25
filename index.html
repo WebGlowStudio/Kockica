@@ -2,363 +2,166 @@
 <html lang="sr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Tamnica i kocka</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#1A120C">
+<title>Kockica – avantura za jednog igrača | WebGlow Studio</title>
+<meta name="description" content="Kockica je avantura sa kockicom u pregledaču: izaberi lika, baci d20 i kreni iz krčme, kroz šumu i tamnicu, do zmaja. Napravio WebGlow Studio.">
+<meta name="keywords" content="Kockica, igrica, D&D, avantura, kockica, d20, WebGlow Studio, besplatna igrica">
+<meta name="author" content="WebGlow Studio">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://webglowstudio.github.io/Kockica/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sr_RS">
+<meta property="og:site_name" content="WebGlow Studio">
+<meta property="og:title" content="Kockica – avantura za jednog igrača | WebGlow Studio">
+<meta property="og:description" content="Izaberi ratnika, čarobnjaka ili lopova, baci kocku i vodi priču do zmaja.">
+<meta property="og:url" content="https://webglowstudio.github.io/Kockica/">
+<meta property="og:image" content="https://webglowstudio.github.io/Kockica/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kockica – avantura WebGlow Studija">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kockica – avantura za jednog igrača">
+<meta name="twitter:description" content="Izaberi lika, baci d20 i kreni do zmaja.">
+<meta name="twitter:image" content="https://webglowstudio.github.io/Kockica/og-image.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;800&family=Jost:wght@400;500;700&display=swap" rel="stylesheet">
-<style>
-  :root{--bg:#120e0b;--panel:#1e1712;--panel2:#2a2019;--line:#4a3a2a;--gold:#e8b84a;--text:#f1e6d2;--muted:#b9a88f;--red:#d2463a;--green:#4caf6a;--blue:#4a8fd6}
-  *{box-sizing:border-box}
-  html,body{margin:0;height:100%;background:radial-gradient(ellipse at top,#2b1f16,#0c0907 70%);color:var(--text);font-family:"Jost",system-ui,sans-serif;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none}
-  #app{max-width:520px;margin:0 auto;height:100%;display:flex;flex-direction:column;padding:10px 12px calc(12px + env(safe-area-inset-bottom))}
-  h1,h2,h3,.cinzel{font-family:"Cinzel",Georgia,serif}
-  button{font:inherit;cursor:pointer;border:0}
-
-  /* top bar */
-  .bar{display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 12px}
-  .hero-ico{font-size:30px;line-height:1}
-  .stats{flex:1;min-width:0}
-  .row1{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);font-weight:500}
-  .row1 b{color:var(--text)}
-  .hpbar{height:10px;background:#000;border-radius:6px;overflow:hidden;margin:4px 0 3px;border:1px solid #3a2c20}
-  .hpfill{height:100%;background:linear-gradient(90deg,#b8322a,#e05a3c);transition:width .35s}
-  .xpbar{height:4px;background:#000;border-radius:3px;overflow:hidden}
-  .xpfill{height:100%;background:var(--blue);transition:width .35s}
-  .chips{display:flex;gap:8px;font-size:13px;font-weight:700;margin-top:2px}
-
-  /* scene */
-  .scene{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px 4px;min-height:0;position:relative}
-  .floor{font-family:"Cinzel",serif;color:var(--gold);font-size:13px;letter-spacing:.2em}
-  .big{font-size:84px;line-height:1.1;margin:6px 0;filter:drop-shadow(0 8px 14px rgba(0,0,0,.6));transition:transform .15s}
-  .big.hit{animation:hit .35s}
-  .big.boss{font-size:104px}
-  @keyframes hit{0%,100%{transform:none}25%{transform:translateX(-10px) rotate(-6deg);filter:brightness(2.2) drop-shadow(0 0 10px red)}60%{transform:translateX(8px) rotate(4deg)}}
-  .title{font-size:22px;margin:0 0 4px;color:var(--gold)}
-  .desc{color:var(--muted);font-size:15.5px;line-height:1.45;max-width:400px;margin:0}
-  .mhp{width:min(240px,70%);height:8px;background:#000;border-radius:5px;overflow:hidden;margin:8px auto 2px;border:1px solid #3a2c20}
-  .mhp div{height:100%;background:var(--red);transition:width .3s}
-  .mstat{font-size:12.5px;color:var(--muted)}
-
-  /* die */
-  .dice{height:92px;display:flex;align-items:center;justify-content:center;gap:12px}
-  .die{width:78px;height:78px;position:relative;display:grid;place-items:center;opacity:.25;transition:opacity .2s}
-  .die.on{opacity:1}
-  .die svg{position:absolute;inset:0;width:100%;height:100%}
-  .die .num{position:relative;font-family:"Cinzel",serif;font-weight:800;font-size:26px;color:#1a120c;margin-top:4px}
-  .die .lbl{position:absolute;bottom:-14px;font-size:11px;color:var(--muted);font-weight:700;letter-spacing:.1em}
-  .die.spin svg{animation:spin .12s linear infinite}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .die.crit .num{color:#7a4f00}.die.crit svg polygon:first-child{fill:#ffe27a}
-  .die.fail svg polygon:first-child{fill:#e46a5c}
-  .die.land{animation:land .3s}
-  @keyframes land{0%{transform:scale(1.35)}100%{transform:scale(1)}}
-
-  /* log */
-  .log{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:14px;line-height:1.4;min-height:66px;max-height:96px;overflow:hidden;margin:6px 0 8px}
-  .log p{margin:2px 0;color:var(--muted)}
-  .log p:first-child{color:var(--text)}
-  .g{color:var(--gold)!important}.r{color:#ff7a6a!important}.gr{color:#7fdc95!important}
-
-  /* actions */
-  .actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .act{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:12px;padding:13px 8px;font-weight:700;font-size:15.5px;line-height:1.2;transition:.15s}
-  .act small{display:block;font-weight:500;font-size:12px;color:var(--muted);margin-top:2px}
-  .act:active{transform:scale(.97)}
-  .act.main{background:linear-gradient(180deg,#f0c35a,#c98f22);color:#1a120c;border-color:#f0c35a;grid-column:1/-1;font-size:18px;padding:15px}
-  .act.main small{color:#3a2a10}
-  .act.full{grid-column:1/-1}
-  .act:disabled{opacity:.4;pointer-events:none}
-
-  /* overlay screens */
-  .screen{position:fixed;inset:0;background:rgba(8,6,4,.94);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:22px;text-align:center;z-index:10;overflow:auto}
-  .screen h1{color:var(--gold);font-size:clamp(32px,9vw,50px);margin:0 0 4px;text-shadow:0 4px 0 #000}
-  .screen p{color:var(--muted);max-width:400px;line-height:1.5;margin:4px 0 14px}
-  .picks{display:grid;gap:10px;width:min(100%,420px)}
-  .pick{display:flex;align-items:center;gap:14px;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;color:var(--text)}
-  .pick:hover,.pick:active{border-color:var(--gold)}
-  .pick .e{font-size:42px}
-  .pick h3{margin:0;color:var(--gold);font-size:19px}
-  .pick span{font-size:13.5px;color:var(--muted);display:block;line-height:1.35}
-  .pick em{font-style:normal;color:var(--text);font-size:12.5px}
-  .hidden{display:none!important}
-  .shop{display:grid;gap:8px;width:100%}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"VideoGame","name":"Kockica","url":"https://webglowstudio.github.io/Kockica/","inLanguage":"sr","description":"Avantura sa kockicom za jednog igrača: izaberi lika, baci d20 i kreni iz krčme do zmaja.","gamePlatform":"Web browser","genre":"Role-playing","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"},"author":{"@type":"Organization","name":"WebGlow Studio","url":"https://webglowstudio.github.io/Webglowstudioportfolio/"}}
+</script>
 </head>
 <body>
 <div id="app">
-  <div class="bar">
-    <div class="hero-ico" id="hIco">🛡️</div>
-    <div class="stats">
-      <div class="row1"><span id="hName" class="cinzel">Junak</span><span>Nivo <b id="hLvl">1</b> · ❤️ <b id="hHp">0</b></span></div>
-      <div class="hpbar"><div class="hpfill" id="hpFill"></div></div>
-      <div class="xpbar"><div class="xpfill" id="xpFill"></div></div>
-      <div class="chips"><span>🪙 <span id="hGold">0</span></span><span>🧪 <span id="hPot">0</span></span><span>⚔️ +<span id="hAtk">0</span></span><span>🛡️ <span id="hAc">0</span></span><span id="hSkill">✨ 0</span></div>
+  <header class="chrome">
+    <div class="brand">
+      <img src="favicon.svg" width="28" height="28" alt="">
+      <span>Kockica</span>
+    </div>
+    <div class="chrome-actions">
+      <button type="button" id="btn-sheet" class="text-btn" hidden>Lik</button>
+      <button type="button" id="btn-mute" class="icon-btn" aria-pressed="false" aria-label="Utišaj zvuk" title="Zvuk">
+        <svg id="icon-on" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M4 9v6h3l5 4V5L7 9H4zm11.5 3a3.5 3.5 0 0 0-1.8-3.1v6.2A3.5 3.5 0 0 0 15.5 12zM14 4.2v1.7a6.5 6.5 0 0 1 0 12.2v1.7a8.2 8.2 0 0 0 0-15.6z"/></svg>
+        <svg id="icon-off" viewBox="0 0 24 24" width="22" height="22" hidden aria-hidden="true"><path fill="currentColor" d="M4 9v6h3l5 4V5L7 9H4zm16.5 3 2-2-1.1-1.1-2 2-2-2-1.1 1.1 2 2-2 2 1.1 1.1 2-2 2 2 1.1-1.1-2-2z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="stage">
+    <section id="screen-title" class="screen" aria-labelledby="t-title">
+      <p class="eyebrow">WebGlow Studio</p>
+      <h1 id="t-title">Kockica</h1>
+      <p class="lead">Izaberi lika, pa biraj šta ćeš da kažeš i uradiš. Kad treba sreća, baca se kocka sa dvadeset strana — što veći broj, to bolje. Dvadesetica je sjajan uspeh, a jedinica je nesreća.</p>
+      <p class="lead subtle">U borbi prvo bacaš na pogodak, pa tek onda štetu. Napitak ti vraća život. Priča ide iz krčme, kroz šumu i tamnicu, do zmaja.</p>
+      <div class="actions">
+        <button type="button" id="btn-continue" class="btn primary" hidden>Nastavi avanturu</button>
+        <button type="button" id="btn-new" class="btn primary">Nova avantura</button>
+      </div>
+    </section>
+
+    <section id="screen-create" class="screen" hidden aria-labelledby="c-title">
+      <p class="eyebrow">Stvaranje lika</p>
+      <h1 id="c-title">Ko kreće na put?</h1>
+      <label class="name-field">
+        <span>Ime</span>
+        <input id="hero-name" type="text" maxlength="24" placeholder="Junak" autocomplete="off" spellcheck="false">
+      </label>
+      <div id="class-picks" class="picks"></div>
+    </section>
+
+    <section id="screen-play" hidden>
+      <div class="hud" id="hud">
+        <div class="hud-top">
+          <div>
+            <div class="hud-name" id="hud-name">Junak</div>
+            <div class="hud-class" id="hud-class"></div>
+          </div>
+          <div class="hud-meta">
+            <span id="hud-level">Nivo 1</span>
+            <span id="hud-ac">KO 16</span>
+            <span id="hud-gold">0 zlata</span>
+          </div>
+        </div>
+        <div class="bar-wrap" title="Život">
+          <div class="bar hp"><div id="hp-fill"></div></div>
+          <span id="hud-hp">0/0</span>
+        </div>
+        <div class="bar-wrap thin" title="Iskustvo">
+          <div class="bar xp"><div id="xp-fill"></div></div>
+          <span id="hud-xp"></span>
+        </div>
+      </div>
+
+      <div class="scene" id="scene">
+        <p class="place" id="scene-place"></p>
+        <div class="art" id="scene-art" data-art="tavern" aria-hidden="true"></div>
+        <h2 id="scene-title"></h2>
+        <p class="body" id="scene-text"></p>
+        <div id="foes" class="foes" hidden></div>
+      </div>
+
+      <div class="dice" id="dice-tray" aria-live="polite">
+        <div class="die" id="die">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <polygon points="50,3 93,27 93,73 50,97 7,73 7,27" fill="#e8d9b8" stroke="#8a6a32" stroke-width="3"/>
+            <polygon points="50,18 80,68 20,68" fill="none" stroke="#b39760" stroke-width="1.8"/>
+            <path d="M50 3 50 18M93 27 80 68M7 27 20 68M50 97 50 68M93 73 80 68M7 73 20 68" stroke="#b39760" stroke-width="1.8" fill="none"/>
+          </svg>
+          <span class="num" id="die-num">20</span>
+          <span class="lbl" id="die-lbl">d20</span>
+        </div>
+        <p class="die-caption" id="die-caption">Kocka čeka tvoj potez</p>
+      </div>
+
+      <div class="log" id="log" aria-live="polite"></div>
+      <div class="actions" id="actions"></div>
+    </section>
+  </main>
+</div>
+
+<div id="overlay-sheet" class="overlay" hidden>
+  <div class="panel" role="dialog" aria-labelledby="sheet-title">
+    <h2 id="sheet-title">List lika</h2>
+    <div id="sheet-body"></div>
+    <button type="button" id="btn-close-sheet" class="btn">Zatvori</button>
+  </div>
+</div>
+
+<div id="overlay-level" class="overlay" hidden>
+  <div class="panel" role="dialog" aria-labelledby="lvl-title">
+    <h2 id="lvl-title">Novi nivo</h2>
+    <div id="lvl-body"></div>
+    <button type="button" id="btn-ack-level" class="btn primary">Nastavi</button>
+  </div>
+</div>
+
+<div id="overlay-react" class="overlay" hidden>
+  <div class="panel" role="dialog" aria-labelledby="react-title">
+    <h2 id="react-title">Štit</h2>
+    <p id="react-text"></p>
+    <div class="actions">
+      <button type="button" id="btn-shield" class="btn primary">Upotrebi štit</button>
+      <button type="button" id="btn-no-shield" class="btn">Pusti udarac</button>
     </div>
   </div>
+</div>
 
-  <div class="scene">
-    <div class="floor" id="floorTxt">SPRAT 1 · SOBA 1</div>
-    <div class="big" id="big">🚪</div>
-    <h2 class="title" id="title">Ulaz u tamnicu</h2>
-    <p class="desc" id="desc"></p>
-    <div id="mBox" class="hidden"><div class="mhp"><div id="mFill"></div></div><div class="mstat" id="mStat"></div></div>
+<div id="overlay-end" class="overlay" hidden>
+  <div class="panel" role="dialog" aria-labelledby="end-title">
+    <h2 id="end-title"></h2>
+    <p id="end-text"></p>
+    <div class="actions">
+      <button type="button" id="btn-retry" class="btn primary" hidden>Pokušaj ponovo ovu borbu</button>
+      <button type="button" id="btn-again" class="btn">Nova avantura</button>
+    </div>
   </div>
-
-  <div class="dice">
-    <div class="die" id="die"><svg viewBox="0 0 100 100"><polygon points="50,3 93,27 93,73 50,97 7,73 7,27" fill="#e9dcc2" stroke="#8a6a3a" stroke-width="3"/><polygon points="50,18 80,68 20,68" fill="none" stroke="#b39a70" stroke-width="2"/><path d="M50 3 50 18M93 27 80 68M7 27 20 68M50 97 50 68M93 73 80 68M7 73 20 68" stroke="#b39a70" stroke-width="2"/></svg><span class="num" id="dieNum">20</span><span class="lbl" id="dieLbl">d20</span></div>
-  </div>
-
-  <div class="log" id="log"></div>
-  <div class="actions" id="actions"></div>
 </div>
 
-<div class="screen" id="pickScreen">
-  <h1>Tamnica i kocka</h1>
-  <p>Izaberi junaka, siđi u tamnicu i neka ti kocka bude naklonjena. Svaki potez odlučuje <b>d20</b>: što veći broj, to bolje. <b>20</b> = kritičan pogodak!</p>
-  <div class="picks" id="picks"></div>
-  <p id="bestTxt" style="margin-top:16px;font-size:13px"></p>
-</div>
-<div class="screen hidden" id="overScreen">
-  <div style="font-size:70px">💀</div>
-  <h1>Pao/la si…</h1>
-  <p id="overTxt"></p>
-  <button class="act main" style="width:220px" id="againBtn">Nova avantura</button>
-</div>
-
-<script>
-// ---------- data ----------
-const HEROES={
-  ratnik:{name:'Ratnik',emoji:'🛡️',hp:34,ac:15,atk:5,die:10,bonus:3,crit:20,skill:'Snažan udarac',skillTxt:'napad +3, šteta +8',uses:1,desc:'Puno života i jak oklop. Najlakši za početak.'},
-  carobnica:{name:'Čarobnica',emoji:'🧙‍♀️',hp:22,ac:12,atk:4,die:8,bonus:2,crit:20,skill:'Vatrena lopta',skillTxt:'uvek pogađa: 3d6+nivo',uses:2,desc:'Malo života, ali razorna magija. Dobra u čitanju runa.'},
-  lopov:{name:'Lopov',emoji:'🗡️',hp:27,ac:14,atk:6,die:6,bonus:3,crit:18,skill:'Udarac iz senke',skillTxt:'napad +5, dupla šteta',uses:1,desc:'Kritični udarci od 18, lakše beži i otvara kovčege.'}
-};
-const MON=[
-  [{n:'Pacov',e:'🐀',hp:7,ac:10,atk:2,d:4,b:0,xp:8,g:4},{n:'Slepi miš',e:'🦇',hp:6,ac:12,atk:3,d:4,b:0,xp:8,g:3},{n:'Goblin',e:'👺',hp:10,ac:12,atk:3,d:6,b:0,xp:12,g:8},{n:'Zelena sluz',e:'🟢',hp:12,ac:8,atk:2,d:6,b:0,xp:10,g:5}],
-  [{n:'Kostur',e:'💀',hp:15,ac:13,atk:4,d:6,b:1,xp:18,g:10},{n:'Paukovica',e:'🕷️',hp:13,ac:13,atk:5,d:6,b:1,xp:18,g:8},{n:'Vuk',e:'🐺',hp:16,ac:12,atk:4,d:8,b:0,xp:18,g:6},{n:'Zmija',e:'🐍',hp:12,ac:14,atk:5,d:6,b:0,xp:16,g:7}],
-  [{n:'Zombi',e:'🧟',hp:24,ac:11,atk:5,d:8,b:2,xp:28,g:14},{n:'Ork',e:'👹',hp:25,ac:14,atk:6,d:10,b:1,xp:32,g:18},{n:'Duh',e:'👻',hp:18,ac:15,atk:6,d:8,b:1,xp:28,g:12},{n:'Trol',e:'🧌',hp:32,ac:12,atk:6,d:10,b:2,xp:38,g:20}]
-];
-const BOSSES=[
-  {n:'Kralj goblina',e:'👺',hp:30,ac:13,atk:5,d:8,b:2,xp:60,g:50,txt:'Na tronu od kostiju sedi debeli goblin s krunom.'},
-  {n:'Nekromant',e:'🧙‍♂️',hp:40,ac:14,atk:6,d:10,b:2,xp:90,g:80,txt:'Zelena svetlost, šapat mrtvih… Nekromant podiže štap.'},
-  {n:'Crveni zmaj',e:'🐉',hp:60,ac:16,atk:8,d:12,b:3,xp:150,g:150,txt:'Planina zlata. Na njoj se budi ogroman zmaj.'}
-];
-const ROOMS_PER_FLOOR=5;
-
-// ---------- state ----------
-let H,M,floor,room,busy=false,logLines=[];
-let best=0;try{best=+localStorage.getItem('tamnica_best')||0}catch(e){}
-const $=id=>document.getElementById(id);
-const rnd=n=>1+Math.floor(Math.random()*n);
-const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-
-function log(t,cls=''){logLines.unshift(`<p class="${cls}">${t}</p>`);logLines=logLines.slice(0,4);$('log').innerHTML=logLines.join('');}
-function scene(e,title,desc,boss=false){const b=$('big');b.textContent=e;b.classList.toggle('boss',boss);$('title').textContent=title;$('desc').innerHTML=desc||'';$('floorTxt').textContent=`SPRAT ${floor} · ${room>ROOMS_PER_FLOOR?'GAZDA':'SOBA '+room}`;}
-function ui(){
-  $('hIco').textContent=H.emoji;$('hName').textContent=H.name;$('hLvl').textContent=H.lvl;$('hHp').textContent=`${H.hp}/${H.max}`;
-  $('hpFill').style.width=Math.max(0,H.hp/H.max*100)+'%';$('xpFill').style.width=Math.min(100,H.xp/(H.lvl*30)*100)+'%';
-  $('hGold').textContent=H.gold;$('hPot').textContent=H.pot;$('hAtk').textContent=H.atk;$('hAc').textContent=H.ac;$('hSkill').textContent='✨ '+H.uses;
-  if(M){$('mBox').classList.remove('hidden');$('mFill').style.width=Math.max(0,M.hp/M.max*100)+'%';$('mStat').textContent=`❤️ ${Math.max(0,M.hp)}/${M.max} · 🛡️ ${M.ac} · ⚔️ +${M.atk}`;}else $('mBox').classList.add('hidden');
-}
-function actions(list){
-  $('actions').innerHTML='';
-  list.forEach(a=>{const b=document.createElement('button');b.className='act '+(a.cls||'');b.innerHTML=a.t+(a.s?`<small>${a.s}</small>`:'');b.disabled=!!a.dis;b.onclick=async()=>{if(busy)return;busy=true;lock(true);try{await a.f();}finally{busy=false;lock(false);}};$('actions').appendChild(b);});
-}
-function lock(on){document.querySelectorAll('.act').forEach(b=>{if(on)b.style.pointerEvents='none';else b.style.pointerEvents='';});}
-
-async function roll(sides,label){
-  const die=$('die'),num=$('dieNum');$('dieLbl').textContent=label||('d'+sides);
-  die.className='die on spin';
-  for(let i=0;i<9;i++){num.textContent=rnd(sides);await sleep(55);}
-  const v=rnd(sides);num.textContent=v;
-  die.className='die on land'+(sides===20&&v===20?' crit':'')+(sides===20&&v===1?' fail':'');
-  await sleep(320);return v;
-}
-async function rollMany(n,sides){let s=0;for(let i=0;i<n;i++)s+=await roll(sides,`${n}d${sides} (${i+1}/${n})`);return s;}
-function shakeMon(){const b=$('big');b.classList.remove('hit');void b.offsetWidth;b.classList.add('hit');}
-
-// ---------- flow ----------
-function pickScreen(){
-  $('picks').innerHTML='';
-  Object.entries(HEROES).forEach(([k,h])=>{
-    const b=document.createElement('button');b.className='pick';
-    b.innerHTML=`<div class="e">${h.emoji}</div><div><h3>${h.name}</h3><span>${h.desc}</span><em>❤️ ${h.hp} · 🛡️ ${h.ac} · ⚔️ +${h.atk} · ✨ ${h.skill}</em></div>`;
-    b.onclick=()=>start(k);$('picks').appendChild(b);
-  });
-  $('bestTxt').textContent=best?`🏆 Rekord: stigao/la si do ${best}. sprata`:'';
-  $('pickScreen').classList.remove('hidden');
-}
-function start(k){
-  const h=HEROES[k];
-  H={...h,key:k,max:h.hp,lvl:1,xp:0,gold:10,pot:2,maxUses:h.uses};
-  floor=1;room=0;M=null;logLines=[];
-  $('pickScreen').classList.add('hidden');$('overScreen').classList.add('hidden');
-  log(`${H.name} silazi niz kamene stepenice…`,'g');
-  nextRoom();
-}
-function scaleMon(m,isBoss){
-  const f=floor-1,cycle=Math.floor(f/3);
-  const mult=1+cycle*.6+(isBoss?0:f*.12);
-  const hp=Math.round(m.hp*mult);
-  return {...m,hp,max:hp,ac:m.ac+cycle,atk:m.atk+cycle*2,b:m.b+cycle,xp:Math.round(m.xp*(1+f*.3)),g:Math.round(m.g*(1+f*.3)),boss:isBoss};
-}
-function nextRoom(){
-  room++;M=null;ui();
-  if(room>ROOMS_PER_FLOOR)return bossRoom();
-  const r=Math.random();
-  if(r<.5)return monsterRoom();
-  if(r<.65)return chestRoom();
-  if(r<.82)return eventRoom();
-  if(r<.92)return fountainRoom();
-  return merchantRoom();
-}
-function goOn(){actions([{t:'Dalje →',s:'sledeća soba',cls:'main',f:async()=>nextRoom()}]);}
-
-// ---------- combat ----------
-function monsterRoom(){
-  const tier=Math.min(2,Math.floor((floor-1+Math.random()*1.2)%3));
-  const base=MON[tier][rnd(MON[tier].length)-1];
-  M=scaleMon(base,false);
-  scene(M.e,M.n,`Iz tame izlazi <b>${M.n}</b>! Spremi se za borbu.`);
-  ui();combatMenu();
-}
-function bossRoom(){
-  const base=BOSSES[(floor-1)%3];
-  M=scaleMon(base,true);
-  scene(M.e,'👑 '+M.n,base.txt,true);
-  log(`GAZDA SPRATA: ${M.n}!`,'r');
-  ui();combatMenu();
-}
-function combatMenu(){
-  actions([
-    {t:'⚔️ Napad',s:`baci d20 +${H.atk}`,cls:'main',f:attack},
-    {t:'✨ '+H.skill,s:H.uses?`${H.skillTxt} (${H.uses}×)`:'potrošeno',dis:!H.uses,f:skill},
-    {t:'🧪 Napitak',s:H.pot?`leči 2d8+4 (${H.pot})`:'nemaš',dis:!H.pot,f:async()=>{await drink();if(await monsterTurn())combatMenu();}},
-    {t:'🏃 Beži',s:M.boss?'ne može od gazde':`d20 ≥ ${H.key==='lopov'?6:10}`,dis:M.boss,cls:'full',f:flee}
-  ]);
-}
-async function heroHit(bonusAtk,dmgFn,label){
-  const r=await roll(20,'d20 napad');
-  const total=r+H.atk+bonusAtk;
-  if(r===1){log(`Bacio/la si 1… ${label} potpuno promašuje! 😬`,'r');return false;}
-  const crit=r>=H.crit;
-  if(crit||total>=M.ac){
-    let dmg=await dmgFn(crit);
-    M.hp-=dmg;shakeMon();ui();
-    log(crit?`💥 KRITIČNO! (${r}) ${label} za <b>${dmg}</b> štete!`:`Pogodak! ${r}+${H.atk+bonusAtk}=${total} vs 🛡️${M.ac} → <b>${dmg}</b> štete.`,crit?'g':'');
-    return true;
-  }
-  log(`${r}+${H.atk+bonusAtk}=${total} — ${M.n} se izmakne.`);return false;
-}
-async function baseDmg(crit){let d=await roll(H.die,'d'+H.die+' šteta');if(crit)d+=await roll(H.die,'d'+H.die+' krit');return d+H.bonus;}
-async function attack(){
-  await heroHit(0,baseDmg,'Udarac');
-  if(M.hp<=0)return win();
-  if(await monsterTurn())combatMenu();
-}
-async function skill(){
-  H.uses--;ui();
-  if(H.key==='carobnica'){
-    log('🔥 Vatrena lopta!','g');
-    const d=await rollMany(3,6)+H.lvl;M.hp-=d;shakeMon();ui();log(`Vatrena lopta prži ${M.n} za <b>${d}</b> štete!`,'g');
-  }else if(H.key==='ratnik'){
-    await heroHit(3,async c=>(await baseDmg(c))+8,'Snažan udarac');
-  }else{
-    await heroHit(5,async c=>(await baseDmg(c))*2,'Udarac iz senke');
-  }
-  if(M.hp<=0)return win();
-  if(await monsterTurn())combatMenu();
-}
-async function drink(){
-  H.pot--;const h=await rollMany(2,8)+4;H.hp=Math.min(H.max,H.hp+h);ui();log(`🧪 Popio/la si napitak: +${h} ❤️`,'gr');
-}
-async function flee(){
-  const r=await roll(20,'d20 bekstvo');const need=H.key==='lopov'?6:10;
-  if(r>=need){log(`Pobegao/la si! (${r})`,'gr');M=null;ui();scene('🏃','Uspešno bekstvo','Ostavio/la si čudovište iza sebe.');goOn();return;}
-  log(`Nisi uspeo/la da pobegneš (${r}).`,'r');
-  if(await monsterTurn())combatMenu();
-}
-async function monsterTurn(){
-  await sleep(250);
-  const r=await roll(20,`d20 ${M.n}`);const total=r+M.atk;
-  if(r!==1&&(r===20||total>=H.ac)){
-    let d=0;for(let i=0;i<(r===20?2:1);i++)d+=await roll(M.d,`d${M.d} ${M.n}`);d+=M.b;
-    H.hp-=d;document.body.animate([{background:'#5a1410'},{background:''}],{duration:300});ui();
-    log(`${M.e} ${M.n} ${r===20?'KRITIČNO ':''}pogađa za <b>${d}</b> štete! (${r}+${M.atk}=${total})`,'r');
-    if(H.hp<=0){await sleep(500);gameOver();return false;}
-  }else log(`${M.n} promašuje (${r}+${M.atk}=${total} vs 🛡️${H.ac}).`);
-  return true;
-}
-function gainXp(x){
-  H.xp+=x;
-  while(H.xp>=H.lvl*30){H.xp-=H.lvl*30;H.lvl++;H.max+=7;H.hp=Math.min(H.max,H.hp+12);H.atk++;if(H.lvl%3===0){H.maxUses++;}H.uses=H.maxUses;log(`⭐ NOVI NIVO ${H.lvl}! +7 max ❤️, +1 napad, sposobnost obnovljena.`,'g');}
-  ui();
-}
-async function win(){
-  const m=M;M=null;
-  scene('🏆',`${m.n} je poražen!`,`Dobijaš <b>${m.xp} XP</b> i <b>${m.g} 🪙</b>.`);
-  H.gold+=m.g;log(`Pobeda nad: ${m.n}! +${m.xp} XP, +${m.g} 🪙`,'gr');
-  if(Math.random()<(m.boss?1:.18)){H.pot++;log('Našao/la si 🧪 napitak!','gr');}
-  gainXp(m.xp);
-  if(m.boss){
-    H.hp=Math.min(H.max,H.hp+Math.round(H.max*.4));H.uses=H.maxUses;ui();
-    actions([{t:`Siđi na sprat ${floor+1} ↓`,s:'gazda pobeđen · odmor +40% ❤️',cls:'main',f:async()=>{floor++;room=0;log(`Silaziš na ${floor}. sprat. Vazduh je sve hladniji…`,'g');nextRoom();}}]);
-  }else goOn();
-}
-
-// ---------- rooms ----------
-function chestRoom(){
-  const bonus=H.key==='lopov'?5:0;
-  scene('🧰','Stari kovčeg','Okovan kovčeg u uglu. Možda je pun zlata… a možda ima zamku.');
-  actions([
-    {t:'🔓 Otvori',s:`d20${bonus?' +5':''} ≥ 10`,cls:'main',f:async()=>{
-      const r=await roll(20,'d20 zamka');
-      if(r+bonus>=10){const g=rnd(20)+8*floor;H.gold+=g;log(`Uspeh (${r+bonus})! Unutra je ${g} 🪙.`,'gr');scene('💰','Blago!',`Našao/la si <b>${g} 🪙</b>${Math.random()<.35?(H.pot++,' i 🧪 napitak'):''}.`);}
-      else{const d=await roll(6,'d6 zamka')+floor;H.hp-=d;log(`Zamka! Strelica te pogađa za ${d} štete.`,'r');scene('🏹','Zamka!',`Izgubio/la si <b>${d}</b> ❤️.`);if(H.hp<=0){ui();return gameOver();}}
-      ui();goOn();}},
-    {t:'Ostavi ga',cls:'full',f:async()=>{log('Pametno ili kukavički? Ko zna.');nextRoom();}}
-  ]);
-}
-function fountainRoom(){
-  scene('⛲','Čarobna fontana','Plava voda tiho svetli. Osećaš mir.');
-  actions([{t:'💧 Pij i odmori se',s:'+50% ❤️, obnavlja sposobnost',cls:'main',f:async()=>{const h=Math.round(H.max*.5);H.hp=Math.min(H.max,H.hp+h);H.uses=H.maxUses;ui();log(`Fontana te leči (+${h} ❤️) i vraća snagu.`,'gr');goOn();}}]);
-}
-function merchantRoom(){
-  scene('🧝','Lutajući trgovac','„Psst, putniče! Imam robu za prave junake…“');
-  const shop=()=>actions([
-    {t:'🧪 Napitak',s:'25 🪙',dis:H.gold<25,f:async()=>{H.gold-=25;H.pot++;ui();log('Kupio/la si napitak.','gr');shop();}},
-    {t:'⚔️ Oštrica',s:'+1 napad · 60 🪙',dis:H.gold<60,f:async()=>{H.gold-=60;H.atk++;ui();log('Oštrica je naoštrena! +1 napad.','gr');shop();}},
-    {t:'🛡️ Oklop',s:'+1 odbrana · 70 🪙',dis:H.gold<70,f:async()=>{H.gold-=70;H.ac++;ui();log('Novi oklop! +1 odbrana.','gr');shop();}},
-    {t:'❤️ Amulet',s:'+8 max života · 80 🪙',dis:H.gold<80,f:async()=>{H.gold-=80;H.max+=8;H.hp+=8;ui();log('Amulet života! +8 max ❤️.','gr');shop();}},
-    {t:'Dalje →',cls:'main',f:async()=>nextRoom()}
-  ]);
-  shop();
-}
-const EVENTS=[
-  ()=>{scene('🌉','Trošni most','Uzan most preko provalije. Daske škripe.');
-    actions([{t:'Pređi pažljivo',s:'d20 ≥ 9',cls:'main',f:async()=>{const r=await roll(20);if(r>=9){gainXp(10*floor);log(`Prešao/la si (${r}). +${10*floor} XP`,'gr');}else{const d=await roll(6)+floor;H.hp-=d;ui();log(`Daska puca! Padaš i gubiš ${d} ❤️.`,'r');if(H.hp<=0)return gameOver();}goOn();}}]);},
-  ()=>{const b=H.key==='carobnica'?6:0;scene('🔮','Vrata sa runama','Stara vrata prekrivena svetlećim runama.');
-    actions([{t:'Pročitaj rune',s:`d20${b?' +6':''} ≥ 12`,cls:'main',f:async()=>{const r=await roll(20);if(r+b>=12){const g=15*floor;H.gold+=g;gainXp(15*floor);log(`Rune se otvaraju (${r+b})! +${g} 🪙, +${15*floor} XP`,'gr');}else{const d=await roll(4)+floor;H.hp-=d;ui();log(`Rune te udare strujom: -${d} ❤️`,'r');if(H.hp<=0)return gameOver();}goOn();}},
-      {t:'Zaobiđi',cls:'full',f:async()=>nextRoom()}]);},
-  ()=>{scene('🧔','Ranjeni putnik','Putnik leži uz zid. „Molim te… imaš li napitak?“');
-    actions([{t:'🧪 Daj mu napitak',s:H.pot?'nagrada?':'nemaš napitak',dis:!H.pot,cls:'main',f:async()=>{H.pot--;const g=30+10*floor;H.gold+=g;gainXp(20*floor);log(`„Hvala ti, junače!“ Daje ti ${g} 🪙. +${20*floor} XP`,'gr');goOn();}},
-      {t:'Prođi pored',cls:'full',f:async()=>{log('Putnik tužno gleda za tobom.');nextRoom();}}]);},
-  ()=>{scene('🗿','Kip sa rubinom','Kameni kip drži ogroman crveni rubin.');
-    actions([{t:'💎 Uzmi rubin',s:'d20 ≥ 13',cls:'main',f:async()=>{const r=await roll(20);if(r>=13){const g=40+15*floor;H.gold+=g;ui();log(`Izvukao/la si rubin (${r})! +${g} 🪙`,'gr');scene('💎','Rubin je tvoj!',`+${g} 🪙`);goOn();}else{log('Kip oživljava!','r');M=scaleMon({n:'Kameni golem',e:'🗿',hp:22,ac:15,atk:5,d:8,b:2,xp:35,g:30},false);scene(M.e,M.n,'Kameni golem se pokreće!');ui();combatMenu();}}},
-      {t:'Ne diraj',cls:'full',f:async()=>nextRoom()}]);},
-  ()=>{scene('🍄','Svetleće pečurke','Čudne pečurke svetle ljubičasto. Mirišu… zanimljivo.');
-    actions([{t:'Pojedi jednu',s:'baci d20 i vidi',cls:'main',f:async()=>{const r=await roll(20);if(r>=15){H.max+=5;H.hp+=5;log(`Osećaš se jače! +5 max ❤️ (${r})`,'gr');}else if(r>=6){const h=8;H.hp=Math.min(H.max,H.hp+h);log(`Ukusno! +${h} ❤️ (${r})`,'gr');}else{const d=rnd(6);H.hp-=d;log(`Bljak! Otrovna je: -${d} ❤️ (${r})`,'r');ui();if(H.hp<=0)return gameOver();}ui();goOn();}},
-      {t:'Bolje ne',cls:'full',f:async()=>nextRoom()}]);}
-];
-function eventRoom(){EVENTS[rnd(EVENTS.length)-1]();}
-
-function gameOver(){
-  if(floor>best){best=floor;try{localStorage.setItem('tamnica_best',best)}catch(e){}}
-  $('overTxt').innerHTML=`${H.emoji} ${H.name}, nivo ${H.lvl}<br>Stigao/la si do <b>${floor}. sprata</b> sa <b>${H.gold} 🪙</b><br>🏆 Rekord: ${best}. sprat`;
-  $('overScreen').classList.remove('hidden');
-}
-$('againBtn').onclick=()=>{$('overScreen').classList.add('hidden');pickScreen();};
-pickScreen();
-</script>
+<script type="module" src="game.js"></script>
 </body>
 </html>
